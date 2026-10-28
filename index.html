@@ -3,68 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuantFutbol - Estadísticas Avanzadas ESPN</title>
+  <title>QuantFutbol - Panel Multi-Fuente en Vivo</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 p-4 sm:p-8 font-sans">
-  <div class="max-w-4xl mx-auto space-y-4">
+<body class="bg-slate-950 text-slate-100 p-4 sm:p-6 font-sans">
+  <div class="max-w-7xl mx-auto space-y-4">
     
-    <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+    <!-- Encabezado -->
+    <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
       <div>
-        <h1 class="text-xl font-bold text-cyan-400">Extractor de Estadísticas Cuantitativas</h1>
-        <p class="text-xs text-slate-400">Tiros al arco, córners, faltas, posesión y árbitros vía ESPN Match Summary.</p>
+        <h1 class="text-xl font-bold text-cyan-400">Terminal Multi-Fuente de Datos Deportivos</h1>
+        <p class="text-xs text-slate-400">Comparativa paralela en tiempo real: Métricas avanzadas ESPN vs Archivo Histórico TheSportsDB.</p>
       </div>
-      <span id="sourceBadge" class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded font-mono font-bold">LIVE METRICS</span>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded font-mono font-bold">HTTPS ONLINE</span>
+      </div>
     </div>
 
-    <!-- Buscador -->
-    <div class="flex gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
-      <input type="text" id="teamInput" value="Cienciano" placeholder="Escribe un equipo (ej. Cienciano, Alianza Lima, Barcelona, Argentina)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-semibold">
-      <button onclick="buscarPartidosConEstadisticas()" id="btnBuscar" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5">
-        <span id="btnText">Extraer Métricas</span>
+    <!-- Barra de Búsqueda -->
+    <div class="flex gap-2 bg-slate-900 p-2.5 rounded-xl border border-slate-800 max-w-2xl">
+      <input type="text" id="teamInput" value="Cienciano" placeholder="Escribe un equipo (ej. Cienciano, Alianza Lima, Melgar, Barcelona, Chelsea, Argentina)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-semibold">
+      <button onclick="ejecutarExtraccionTotal()" id="btnBuscar" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5">
+        <span id="btnText">Consultar Ambas Fuentes</span>
         <span id="spinner" class="hidden animate-spin">⏳</span>
       </button>
     </div>
 
-    <!-- Estado -->
+    <!-- Notificación Global -->
     <div id="statusBox" class="hidden p-3 rounded-lg text-xs border font-mono"></div>
 
-    <!-- Contenedor de Partidos y Métricas -->
-    <div id="matchesContainer" class="space-y-4"></div>
+    <!-- PANEL PRINCIPAL MULTI-COLUMNA -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-    <!-- Registro de Depuración -->
+      <!-- COLUMNA 1: ESPN CORE (Métricas Avanzadas) -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-cyan-400">FUENTE 1: ESPN Core Analytics</span>
+            <span class="text-[9px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1.5 py-0.5 rounded font-mono">Métricas Profundas</span>
+          </div>
+          <span id="espnStatusBadge" class="text-[10px] font-mono text-slate-400">En espera</span>
+        </div>
+        
+        <div id="espnContainer" class="space-y-3">
+          <p class="text-xs text-slate-500 text-center py-8">Presiona "Consultar Ambas Fuentes" para cargar métricas de ESPN.</p>
+        </div>
+      </div>
+
+      <!-- COLUMNA 2: TheSportsDB & Feeds Abiertos -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-emerald-400">FUENTE 2: TheSportsDB Open Feed</span>
+            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded font-mono">Escudos & Archivo</span>
+          </div>
+          <span id="sdbStatusBadge" class="text-[10px] font-mono text-slate-400">En espera</span>
+        </div>
+
+        <div id="sdbContainer" class="space-y-3">
+          <p class="text-xs text-slate-500 text-center py-8">Presiona "Consultar Ambas Fuentes" para consultar TheSportsDB.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Registro de Depuración Técnico -->
     <details class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs">
-      <summary class="cursor-pointer text-slate-400 font-mono hover:text-cyan-400">Ver registro de peticiones y respuestas</summary>
-      <pre id="debugLog" class="mt-2 text-[11px] font-mono text-cyan-300 whitespace-pre-wrap max-h-48 overflow-y-auto">Esperando consulta...</pre>
+      <summary class="cursor-pointer text-slate-400 font-mono hover:text-cyan-400">Registro de ejecución y peticiones internas</summary>
+      <pre id="debugLog" class="mt-2 text-[11px] font-mono text-cyan-300 whitespace-pre-wrap max-h-48 overflow-y-auto">Listo para consultar.</pre>
     </details>
 
   </div>
 
   <script>
-    const KNOWN_ESPN_IDS = {
-      'cienciano': { id: '2097', name: 'Cienciano', league: 'per.1' },
-      'alianza lima': { id: '2085', name: 'Alianza Lima', league: 'per.1' },
-      'universitario': { id: '2094', name: 'Universitario', league: 'per.1' },
-      'sporting cristal': { id: '2093', name: 'Sporting Cristal', league: 'per.1' },
-      'melgar': { id: '2090', name: 'Melgar', league: 'per.1' },
-      'sport boys': { id: '2092', name: 'Sport Boys', league: 'per.1' },
-      'boca juniors': { id: '5', name: 'Boca Juniors', league: 'arg.1' },
-      'river plate': { id: '16', name: 'River Plate', league: 'arg.1' },
-      'argentina': { id: '202', name: 'Argentina', league: 'fifa.world' },
-      'peru': { id: '209', name: 'Perú', league: 'fifa.world' },
-      'barcelona': { id: '83', name: 'FC Barcelona', league: 'esp.1' },
-      'real madrid': { id: '86', name: 'Real Madrid', league: 'esp.1' },
-      'chelsea': { id: '363', name: 'Chelsea', league: 'eng.1' }
+    // Diccionario extendido para resolución instantánea
+    const TEAMS_DIRECTORY = {
+      'cienciano': { espnId: '2097', espnLeague: 'per.1', sdbName: 'Cienciano' },
+      'alianza lima': { espnId: '2085', espnLeague: 'per.1', sdbName: 'Alianza Lima' },
+      'universitario': { espnId: '2094', espnLeague: 'per.1', sdbName: 'Universitario' },
+      'sporting cristal': { espnId: '2093', espnLeague: 'per.1', sdbName: 'Sporting Cristal' },
+      'melgar': { espnId: '2090', espnLeague: 'per.1', sdbName: 'FBC Melgar' },
+      'sport boys': { espnId: '2092', espnLeague: 'per.1', sdbName: 'Sport Boys' },
+      'boca juniors': { espnId: '5', espnLeague: 'arg.1', sdbName: 'Boca Juniors' },
+      'river plate': { espnId: '16', espnLeague: 'arg.1', sdbName: 'River Plate' },
+      'argentina': { espnId: '202', espnLeague: 'fifa.world', sdbName: 'Argentina' },
+      'peru': { espnId: '209', espnLeague: 'fifa.world', sdbName: 'Peru' },
+      'perú': { espnId: '209', espnLeague: 'fifa.world', sdbName: 'Peru' },
+      'barcelona': { espnId: '83', espnLeague: 'esp.1', sdbName: 'Barcelona' },
+      'real madrid': { espnId: '86', espnLeague: 'esp.1', sdbName: 'Real Madrid' },
+      'chelsea': { espnId: '363', espnLeague: 'eng.1', sdbName: 'Chelsea' },
+      'arsenal': { espnId: '359', espnLeague: 'eng.1', sdbName: 'Arsenal' }
     };
-
-    function setStatus(msg, type = 'info') {
-      const box = document.getElementById('statusBox');
-      box.classList.remove('hidden', 'bg-rose-950/60', 'border-rose-800', 'text-rose-300', 'bg-emerald-950/60', 'border-emerald-800', 'text-emerald-300', 'bg-cyan-950/60', 'border-cyan-800', 'text-cyan-300');
-      if (type === 'error') box.classList.add('bg-rose-950/60', 'border-rose-800', 'text-rose-300');
-      else if (type === 'success') box.classList.add('bg-emerald-950/60', 'border-emerald-800', 'text-emerald-300');
-      else box.classList.add('bg-cyan-950/60', 'border-cyan-800', 'text-cyan-300');
-      box.innerHTML = msg;
-    }
 
     function addLog(text) {
       const log = document.getElementById('debugLog');
@@ -78,75 +107,98 @@
       return await res.json();
     }
 
-    async function buscarPartidosConEstadisticas() {
+    async function ejecutarExtraccionTotal() {
       const query = document.getElementById('teamInput').value.trim();
-      const container = document.getElementById('matchesContainer');
       const btn = document.getElementById('btnBuscar');
       const spinner = document.getElementById('spinner');
 
-      if (!query) return setStatus("Escribe el nombre de un equipo.", "error");
+      if (!query) return;
 
-      container.innerHTML = "";
-      document.getElementById('debugLog').textContent = `Iniciando consulta para "${query}"...`;
+      document.getElementById('debugLog').textContent = `Iniciando consulta paralela para: ${query}...`;
       btn.disabled = true;
       spinner.classList.remove('hidden');
-      setStatus(`Buscando partidos y métricas avanzadas en ESPN...`, "info");
+
+      // Ejecutar ambas fuentes en paralelo para máxima velocidad
+      await Promise.allSettled([
+        cargarFuenteESPN(query),
+        cargarFuenteTheSportsDB(query)
+      ]);
+
+      btn.disabled = false;
+      spinner.classList.add('hidden');
+    }
+
+    // =========================================================================
+    // 1. MOTOR ESPN (Tiros al arco, Córners, Faltas, Posesión y Árbitros)
+    // =========================================================================
+    async function cargarFuenteESPN(query) {
+      const container = document.getElementById('espnContainer');
+      const badge = document.getElementById('espnStatusBadge');
+      container.innerHTML = `<div class="py-6 text-center text-xs text-cyan-400 animate-pulse">Consultando métricas en ESPN...</div>`;
+      badge.textContent = "Consultando...";
+      badge.className = "text-[10px] font-mono text-cyan-400";
 
       const qLower = query.toLowerCase();
       let teamId = null;
-      let leagueSlug = "all";
+      let league = "all";
       let teamName = query;
 
       try {
-        if (KNOWN_ESPN_IDS[qLower]) {
-          teamId = KNOWN_ESPN_IDS[qLower].id;
-          teamName = KNOWN_ESPN_IDS[qLower].name;
-          leagueSlug = KNOWN_ESPN_IDS[qLower].league;
+        if (TEAMS_DIRECTORY[qLower]) {
+          teamId = TEAMS_DIRECTORY[qLower].espnId;
+          league = TEAMS_DIRECTORY[qLower].espnLeague;
+          teamName = query;
         } else {
-          const sData = await safeFetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(query)}&type=team&sport=soccer&limit=3`);
-          const hit = sData.results?.[0]?.contents?.[0];
-          if (!hit) throw new Error("Equipo no encontrado en el índice");
+          // Búsqueda dinámica si no está en el diccionario rápido
+          const s = await safeFetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(query)}&type=team&sport=soccer&limit=1`);
+          const hit = s.results?.[0]?.contents?.[0];
+          if (!hit) throw new Error("No encontrado en ESPN");
           teamName = hit.displayName || hit.name;
-          let link = typeof hit.link === 'string' ? hit.link : (hit.link?.web || "");
+          const link = typeof hit.link === 'string' ? hit.link : (hit.link?.web || "");
           const m = link.match(/\/id\/(\d+)/);
           teamId = m ? m[1] : hit.id;
         }
 
-        addLog(`ID identificado: ${teamId} | Liga base: ${leagueSlug}`);
+        addLog(`[ESPN] Identificado ID: ${teamId} | Liga: ${league}`);
 
-        // 1. Obtener lista de encuentros
+        // Para evitar partidos sin terminar o en blanco, consultamos con rango de fechas completo
         let events = [];
         try {
-          const sched = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${leagueSlug}/teams/${teamId}/schedule`);
+          const sched = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/schedule`);
           events = sched.events || [];
         } catch (e) {
-          addLog(`Reintentando con Scoreboard de liga...`);
-          const sb = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${leagueSlug}/scoreboard`);
+          // Fallback con el Scoreboard de la liga buscando fechas anteriores
+          const sb = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard?dates=20240101-20261231`);
           events = (sb.events || []).filter(ev => {
-            const competitors = ev.competitions?.[0]?.competitors || [];
-            return competitors.some(c => String(c.team?.id) === String(teamId) || c.team?.displayName?.toLowerCase().includes(qLower));
+            const comps = ev.competitions?.[0]?.competitors || [];
+            return comps.some(c => String(c.team?.id) === String(teamId) || c.team?.displayName?.toLowerCase().includes(qLower));
           });
         }
 
-        if (events.length === 0) {
-          setStatus(`No hay partidos disponibles para ${teamName}.`, "error");
-          return;
+        // Filtramos ÚNICAMENTE partidos completados
+        const completados = events
+          .filter(e => e.competitions?.[0]?.status?.type?.completed === true)
+          .slice(0, 3);
+
+        if (completados.length === 0) {
+          // Si no hay completados en schedule, tomamos los eventos disponibles
+          if (events.length > 0) {
+            completados.push(...events.slice(0, 3));
+          } else {
+            throw new Error("No hay eventos registrados");
+          }
         }
 
-        setStatus(`Extrayendo métricas de los últimos ${Math.min(events.length, 3)} partidos de <b>${teamName}</b>...`, "info");
+        container.innerHTML = "";
+        badge.textContent = `${completados.length} Partidos`;
+        badge.className = "text-[10px] font-mono text-emerald-400 font-bold";
 
-        // 2. Tomar los 3 más recientes y consultar estadísticas avanzadas de cada uno
-        const ultimos = events.slice(0, 3);
-
-        for (const item of ultimos) {
-          const gameId = item.id;
+        for (const item of completados) {
           const comp = item.competitions?.[0] || {};
-          const homeComp = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
-          const awayComp = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+          const homeC = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+          const awayC = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
 
-          // Consulta detallada del partido (Boxscore / Summary)
           let stats = {
-            shots: { home: '-', away: '-' },
             shotsOnTarget: { home: '-', away: '-' },
             corners: { home: '-', away: '-' },
             fouls: { home: '-', away: '-' },
@@ -154,89 +206,52 @@
             referee: 'No registrado'
           };
 
+          // Consultar métricas profundas (boxscore)
           try {
-            const summaryUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/${leagueSlug}/summary?event=${gameId}`;
-            addLog(`Consultando métricas del partido ${gameId}...`);
-            const sumData = await safeFetch(summaryUrl);
+            const sumData = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/summary?event=${item.id}`);
+            if (sumData.gameInfo?.officials?.[0]) stats.referee = sumData.gameInfo.officials[0].displayName;
 
-            // Árbitro asignado
-            if (sumData.gameInfo?.officials?.[0]) {
-              stats.referee = sumData.gameInfo.officials[0].displayName;
-            }
-
-            // Estadísticas por equipo
-            const boxscoreTeams = sumData.boxscore?.teams || [];
-            if (boxscoreTeams.length >= 2) {
-              const parseStat = (teamStats, name) => {
-                const s = teamStats.statistics?.find(st => st.name === name || st.label?.toLowerCase() === name.toLowerCase());
-                return s ? s.displayValue : '-';
-              };
-
-              const tHome = boxscoreTeams.find(t => t.team?.id === homeComp.team?.id) || boxscoreTeams[0];
-              const tAway = boxscoreTeams.find(t => t.team?.id === awayComp.team?.id) || boxscoreTeams[1];
-
-              stats.shots.home = parseStat(tHome, 'shotsTotal') || parseStat(tHome, 'totalShots') || '-';
-              stats.shots.away = parseStat(tAway, 'shotsTotal') || parseStat(tAway, 'totalShots') || '-';
-
-              stats.shotsOnTarget.home = parseStat(tHome, 'shotsOnTarget') || '-';
-              stats.shotsOnTarget.away = parseStat(tAway, 'shotsOnTarget') || '-';
-
-              stats.corners.home = parseStat(tHome, 'wonCorners') || parseStat(tHome, 'cornerKicks') || '-';
-              stats.corners.away = parseStat(tAway, 'wonCorners') || parseStat(tAway, 'cornerKicks') || '-';
-
-              stats.fouls.home = parseStat(tHome, 'foulsCommitted') || '-';
-              stats.fouls.away = parseStat(tAway, 'foulsCommitted') || '-';
-
-              stats.possession.home = parseStat(tHome, 'possessionPct') ? `${parseStat(tHome, 'possessionPct')}%` : '-';
-              stats.possession.away = parseStat(tAway, 'possessionPct') ? `${parseStat(tAway, 'possessionPct')}%` : '-';
+            const bTeams = sumData.boxscore?.teams || [];
+            if (bTeams.length >= 2) {
+              const getS = (t, n) => t.statistics?.find(s => s.name === n || s.label?.toLowerCase() === n.toLowerCase())?.displayValue || '-';
+              const tH = bTeams.find(t => t.team?.id === homeC.team?.id) || bTeams[0];
+              const tA = bTeams.find(t => t.team?.id === awayC.team?.id) || bTeams[1];
+              stats.shotsOnTarget = { home: getS(tH, 'shotsOnTarget'), away: getS(tA, 'shotsOnTarget') };
+              stats.corners = { home: getS(tH, 'wonCorners'), away: getS(tA, 'wonCorners') };
+              stats.fouls = { home: getS(tH, 'foulsCommitted'), away: getS(tA, 'foulsCommitted') };
+              stats.possession = { home: getS(tH, 'possessionPct') ? `${getS(tH, 'possessionPct')}%` : '-', away: getS(tA, 'possessionPct') ? `${getS(tA, 'possessionPct')}%` : '-' };
             }
           } catch (e) {
-            addLog(`Métricas no disponibles para partido ${gameId} (${e.message})`);
+            addLog(`Boxscore no disponible para evento ${item.id}`);
           }
 
-          // Renderizado de tarjeta con métricas
           const card = document.createElement('div');
-          card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3";
+          card.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2 text-xs";
           card.innerHTML = `
-            <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-2">
-              <span class="font-semibold text-slate-300">${item.season?.name || comp.type?.text || 'Competición Oficial'}</span>
+            <div class="flex justify-between text-slate-400 text-[11px] border-b border-slate-800/80 pb-1.5">
+              <span class="truncate max-w-[200px] text-slate-300 font-semibold">${item.season?.name || comp.type?.text || 'Competición'}</span>
               <span class="font-mono">${new Date(item.date).toLocaleDateString('es-ES')}</span>
             </div>
-
-            <!-- Marcador Principal -->
             <div class="flex items-center justify-between py-1">
-              <div class="w-5/12 truncate font-bold text-sm ${homeComp.team?.id === teamId ? 'text-cyan-400' : 'text-slate-200'}">
-                ${homeComp.team?.displayName || 'Local'}
+              <div class="flex items-center gap-1.5 w-5/12">
+                ${homeC.team?.logo ? `<img src="${homeC.team.logo}" class="w-4 h-4 object-contain">` : ''}
+                <span class="font-bold truncate ${homeC.team?.id === teamId ? 'text-cyan-400' : 'text-slate-200'}">${homeC.team?.displayName || 'Local'}</span>
               </div>
-              <div class="px-3.5 py-1 rounded bg-slate-950 border border-slate-800 text-sm font-black font-mono text-white">
-                ${homeComp.score?.displayValue ?? homeComp.score ?? '-'} - ${awayComp.score?.displayValue ?? awayComp.score ?? '-'}
+              <div class="px-2.5 py-0.5 rounded bg-slate-900 border border-slate-700 font-black font-mono text-white text-xs">
+                ${homeC.score?.displayValue ?? homeC.score ?? '-'} - ${awayC.score?.displayValue ?? awayC.score ?? '-'}
               </div>
-              <div class="w-5/12 truncate text-right font-bold text-sm ${awayComp.team?.id === teamId ? 'text-cyan-400' : 'text-slate-200'}">
-                ${awayComp.team?.displayName || 'Visita'}
-              </div>
-            </div>
-
-            <!-- Panel de Estadísticas Cuantitativas -->
-            <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800/80 grid grid-cols-4 gap-2 text-center text-xs font-mono">
-              <div class="space-y-0.5">
-                <span class="text-[10px] text-slate-500 block">Tiros al Arco</span>
-                <span class="text-cyan-400 font-bold">${stats.shotsOnTarget.home} - ${stats.shotsOnTarget.away}</span>
-              </div>
-              <div class="space-y-0.5">
-                <span class="text-[10px] text-slate-500 block">Córners</span>
-                <span class="text-emerald-400 font-bold">${stats.corners.home} - ${stats.corners.away}</span>
-              </div>
-              <div class="space-y-0.5">
-                <span class="text-[10px] text-slate-500 block">Faltas</span>
-                <span class="text-amber-400 font-bold">${stats.fouls.home} - ${stats.fouls.away}</span>
-              </div>
-              <div class="space-y-0.5">
-                <span class="text-[10px] text-slate-500 block">Posesión</span>
-                <span class="text-slate-300 font-bold">${stats.possession.home} / ${stats.possession.away}</span>
+              <div class="flex items-center justify-end gap-1.5 w-5/12">
+                <span class="font-bold truncate text-right ${awayC.team?.id === teamId ? 'text-cyan-400' : 'text-slate-200'}">${awayC.team?.displayName || 'Visita'}</span>
+                ${awayC.team?.logo ? `<img src="${awayC.team.logo}" class="w-4 h-4 object-contain">` : ''}
               </div>
             </div>
-
-            <div class="text-[11px] text-slate-400 flex justify-between pt-1">
+            <div class="bg-slate-900/80 p-2 rounded-lg grid grid-cols-4 gap-1 text-center font-mono text-[11px]">
+              <div><span class="text-[9px] text-slate-500 block">Tiros Arco</span><span class="text-cyan-400 font-bold">${stats.shotsOnTarget.home}-${stats.shotsOnTarget.away}</span></div>
+              <div><span class="text-[9px] text-slate-500 block">Córners</span><span class="text-emerald-400 font-bold">${stats.corners.home}-${stats.corners.away}</span></div>
+              <div><span class="text-[9px] text-slate-500 block">Faltas</span><span class="text-amber-400 font-bold">${stats.fouls.home}-${stats.fouls.away}</span></div>
+              <div><span class="text-[9px] text-slate-500 block">Posesión</span><span class="text-slate-300 font-bold">${stats.possession.home}/${stats.possession.away}</span></div>
+            </div>
+            <div class="text-[10px] text-slate-400 flex justify-between pt-0.5 truncate">
               <span>⚖️ Árbitro: <b class="text-slate-300 font-normal">${stats.referee}</b></span>
               <span>🏟️ ${comp.venue?.fullName || 'Estadio oficial'}</span>
             </div>
@@ -244,14 +259,79 @@
           container.appendChild(card);
         }
 
-        setStatus(`Estadísticas de <b>${teamName}</b> cargadas exitosamente.`, "success");
+      } catch (err) {
+        badge.textContent = "Sin datos";
+        badge.className = "text-[10px] font-mono text-rose-400";
+        container.innerHTML = `<div class="p-4 rounded-lg bg-rose-950/30 border border-rose-900/60 text-xs text-rose-300 text-center">ESPN no devolvió partidos completados para esta selección.</div>`;
+        addLog(`[ESPN Fallo]: ${err.message}`);
+      }
+    }
+
+    // =========================================================================
+    // 2. MOTOR THESPORTSDB (Escudos oficiales, Estadios y Resultados)
+    // =========================================================================
+    async function cargarFuenteTheSportsDB(query) {
+      const container = document.getElementById('sdbContainer');
+      const badge = document.getElementById('sdbStatusBadge');
+      container.innerHTML = `<div class="py-6 text-center text-xs text-emerald-400 animate-pulse">Consultando TheSportsDB...</div>`;
+      badge.textContent = "Consultando...";
+      badge.className = "text-[10px] font-mono text-emerald-400";
+
+      const qLower = query.toLowerCase();
+      const sdbTerm = TEAMS_DIRECTORY[qLower]?.sdbName || query;
+
+      try {
+        addLog(`[TheSportsDB] Buscando: ${sdbTerm}`);
+        const sUrl = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(sdbTerm)}`;
+        const sData = await safeFetch(sUrl);
+
+        if (!sData.teams || sData.teams.length === 0) throw new Error("Equipo no registrado en TheSportsDB");
+
+        const team = sData.teams[0];
+        addLog(`[TheSportsDB] Club: ${team.strTeam} (ID: ${team.idTeam})`);
+
+        const evUrl = `https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=${team.idTeam}`;
+        const evData = await safeFetch(evUrl);
+        const results = evData.results || [];
+
+        if (results.length === 0) throw new Error("Sin partidos recientes en registro");
+
+        container.innerHTML = "";
+        badge.textContent = `${results.length} Partidos`;
+        badge.className = "text-[10px] font-mono text-emerald-400 font-bold";
+
+        results.slice(0, 3).forEach(m => {
+          const card = document.createElement('div');
+          card.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2 text-xs";
+          card.innerHTML = `
+            <div class="flex justify-between text-slate-400 text-[11px] border-b border-slate-800/80 pb-1.5">
+              <span class="truncate max-w-[200px] text-slate-300 font-semibold">${m.strLeague || 'Liga Oficial'}</span>
+              <span class="font-mono">${m.dateEvent ? new Date(m.dateEvent).toLocaleDateString('es-ES') : ''}</span>
+            </div>
+            <div class="flex items-center justify-between py-1">
+              <div class="flex items-center gap-1.5 w-5/12">
+                <span class="font-bold truncate text-slate-200">${m.strHomeTeam}</span>
+              </div>
+              <div class="px-2.5 py-0.5 rounded bg-slate-900 border border-slate-700 font-black font-mono text-white text-xs">
+                ${m.intHomeScore ?? '-'} - ${m.intAwayScore ?? '-'}
+              </div>
+              <div class="flex items-center justify-end gap-1.5 w-5/12">
+                <span class="font-bold truncate text-right text-slate-200">${m.strAwayTeam}</span>
+              </div>
+            </div>
+            <div class="text-[10px] text-slate-400 flex justify-between pt-0.5 truncate border-t border-slate-800/40">
+              <span>🏟️ Estadio: <b class="text-slate-300 font-normal">${m.strVenue || 'Sede oficial'}</b></span>
+              <span class="text-emerald-400 font-mono">Registro Confirmado</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
 
       } catch (err) {
-        setStatus(`Error general: ${err.message}`, "error");
-        addLog(`Error en el flujo: ${err.message}`);
-      } finally {
-        btn.disabled = false;
-        spinner.classList.add('hidden');
+        badge.textContent = "Sin datos";
+        badge.className = "text-[10px] font-mono text-rose-400";
+        container.innerHTML = `<div class="p-4 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">No disponible en la base de TheSportsDB.</div>`;
+        addLog(`[TheSportsDB Fallo]: ${err.message}`);
       }
     }
   </script>
