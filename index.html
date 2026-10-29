@@ -3,74 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuantFutbol - Panel Multi-Fuente Tripartito</title>
+  <title>QuantFutbol Pro - Sportsbook Data Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 p-4 sm:p-6 font-sans">
   <div class="max-w-7xl mx-auto space-y-4">
     
-    <!-- Encabezado -->
+    <!-- Encabezado Pro -->
     <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
       <div>
-        <h1 class="text-xl font-bold text-cyan-400">Terminal Multi-Fuente Deportiva (3 Motores)</h1>
-        <p class="text-xs text-slate-400">Monitoreo paralelo en vivo: ESPN Analytics vs TheSportsDB vs OpenSports Feed.</p>
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚽</span>
+          <h1 class="text-xl font-bold text-cyan-400">Terminal Cuantitativa Deportiva Pro</h1>
+        </div>
+        <p class="text-xs text-slate-400">Partidos recientes, tiros, córners, árbitros, estadios y plantilla de jugadores en vivo.</p>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded font-mono font-bold">HTTPS GITHUB ONLINE</span>
+        <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded font-mono font-bold">HTTPS LIVE ENGINE</span>
       </div>
     </div>
 
-    <!-- Barra de Búsqueda -->
-    <div class="flex gap-2 bg-slate-900 p-2.5 rounded-xl border border-slate-800 max-w-2xl">
-      <input type="text" id="teamInput" value="Cienciano" placeholder="Escribe un equipo (ej. Cienciano, Alianza Lima, Melgar, Chelsea, Inter Milan, Japan)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-semibold">
-      <button onclick="ejecutarExtraccionTotal()" id="btnBuscar" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5">
-        <span id="btnText">Consultar las 3 Fuentes</span>
-        <span id="spinner" class="hidden animate-spin">⏳</span>
-      </button>
+    <!-- Barra de Búsqueda y Filtros Rápidos -->
+    <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex gap-2 max-w-2xl">
+        <input type="text" id="teamInput" value="Cienciano" placeholder="Escribe un equipo (ej. Cienciano, Alianza Lima, Melgar, Chelsea, Barcelona, Argentina)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-semibold">
+        <button onclick="ejecutarExtraccionTotal()" id="btnBuscar" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg">
+          <span id="btnText">Extraer Full Datos</span>
+          <span id="spinner" class="hidden animate-spin">⏳</span>
+        </button>
+      </div>
+      
+      <!-- Atajos rápidos -->
+      <div class="flex flex-wrap items-center gap-1.5 text-[11px] pt-1 text-slate-400">
+        <span class="text-slate-500 font-mono">Consultas directas:</span>
+        <button onclick="buscarAtajo('Cienciano')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300">Cienciano</button>
+        <button onclick="buscarAtajo('Alianza Lima')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300">Alianza Lima</button>
+        <button onclick="buscarAtajo('Melgar')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300">Melgar</button>
+        <button onclick="buscarAtajo('Argentina')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300">Argentina</button>
+        <button onclick="buscarAtajo('Chelsea')" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300">Chelsea</button>
+      </div>
     </div>
 
-    <!-- PANEL PRINCIPAL TRIPARTITO (3 COLUMNAS) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- PANEL PRINCIPAL TRIPARTITO -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-      <!-- COLUMNA 1: ESPN CORE ANALYTICS -->
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <!-- COLUMNA 1: ESPN ANALYTICS (PARTIDOS + TIROS + CÓRNERS + ÁRBITRO) -->
+      <div class="lg:col-span-6 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-cyan-400">1. ESPN Core</span>
-            <span class="text-[9px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1.5 py-0.5 rounded font-mono">Métricas</span>
+            <span class="text-sm font-bold text-cyan-400">📊 1. Historial de Partidos & Métricas</span>
+            <span class="text-[9px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1.5 py-0.5 rounded font-mono">Tiros/Córners/Árbitros</span>
           </div>
           <span id="espnStatusBadge" class="text-[10px] font-mono text-slate-400">En espera</span>
         </div>
         <div id="espnContainer" class="space-y-3">
-          <p class="text-xs text-slate-500 text-center py-10">Presiona "Consultar" para buscar en ESPN.</p>
+          <p class="text-xs text-slate-500 text-center py-10">Presiona "Extraer Full Datos" para cargar partidos.</p>
         </div>
       </div>
 
-      <!-- COLUMNA 2: THESPORTSDB (ARREGLADO CON PROXY ROTATIVO) -->
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <!-- COLUMNA 2: PLANTILLA DE JUGADORES (ROSTER OFICIAL) -->
+      <div class="lg:col-span-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-emerald-400">2. TheSportsDB</span>
-            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded font-mono">Histórico</span>
+            <span class="text-sm font-bold text-amber-400">🏃 2. Plantilla de Jugadores</span>
+            <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.5 rounded font-mono">Alineación</span>
+          </div>
+          <span id="rosterBadge" class="text-[10px] font-mono text-slate-400">0 jugadores</span>
+        </div>
+        <div id="rosterContainer" class="space-y-2 max-h-[520px] overflow-y-auto pr-1">
+          <p class="text-xs text-slate-500 text-center py-10">Plantilla pendiente de búsqueda.</p>
+        </div>
+      </div>
+
+      <!-- COLUMNA 3: THESPORTSDB (HISTORIAL + ESTADIO) -->
+      <div class="lg:col-span-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-emerald-400">🏟️ 3. TheSportsDB</span>
+            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded font-mono">Sedes & Liga</span>
           </div>
           <span id="sdbStatusBadge" class="text-[10px] font-mono text-slate-400">En espera</span>
         </div>
         <div id="sdbContainer" class="space-y-3">
-          <p class="text-xs text-slate-500 text-center py-10">Presiona "Consultar" para buscar en TheSportsDB.</p>
-        </div>
-      </div>
-
-      <!-- COLUMNA 3: OPENSPORTS FEED (GLOBAL LEAGUES) -->
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-amber-400">3. Global Open Feed</span>
-            <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.5 rounded font-mono">Encuentros</span>
-          </div>
-          <span id="openStatusBadge" class="text-[10px] font-mono text-slate-400">En espera</span>
-        </div>
-        <div id="openContainer" class="space-y-3">
-          <p class="text-xs text-slate-500 text-center py-10">Presiona "Consultar" para buscar en Global Feed.</p>
+          <p class="text-xs text-slate-500 text-center py-10">Historial TheSportsDB pendiente.</p>
         </div>
       </div>
 
@@ -78,14 +93,14 @@
 
     <!-- Registro de Depuración Técnico -->
     <details class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs">
-      <summary class="cursor-pointer text-slate-400 font-mono hover:text-cyan-400">Consola de auditoría de red</summary>
+      <summary class="cursor-pointer text-slate-400 font-mono hover:text-cyan-400">Ver registro de depuración en vivo</summary>
       <pre id="debugLog" class="mt-2 text-[11px] font-mono text-cyan-300 whitespace-pre-wrap max-h-48 overflow-y-auto">Listo para iniciar consultas.</pre>
     </details>
 
   </div>
 
   <script>
-    // Catálogo canónico para resolución inmediata en milisegundos
+    // Catálogo canónico con leagues específicas para evitar el HTTP 500 de ESPN
     const TEAMS_DIRECTORY = {
       'cienciano': { espnId: '2097', espnLeague: 'per.1', sdbName: 'Cienciano' },
       'alianza lima': { espnId: '2085', espnLeague: 'per.1', sdbName: 'Alianza Lima' },
@@ -103,10 +118,7 @@
       'chelsea': { espnId: '363', espnLeague: 'eng.1', sdbName: 'Chelsea' },
       'arsenal': { espnId: '359', espnLeague: 'eng.1', sdbName: 'Arsenal' },
       'inter milan': { espnId: '110', espnLeague: 'ita.1', sdbName: 'Inter' },
-      'inter': { espnId: '110', espnLeague: 'ita.1', sdbName: 'Inter' },
-      'japan': { espnId: '627', espnLeague: 'fifa.world', sdbName: 'Japan' },
-      'japon': { espnId: '627', espnLeague: 'fifa.world', sdbName: 'Japan' },
-      'japón': { espnId: '627', espnLeague: 'fifa.world', sdbName: 'Japan' }
+      'japan': { espnId: '627', espnLeague: 'fifa.world', sdbName: 'Japan' }
     };
 
     function addLog(text) {
@@ -121,6 +133,11 @@
       return await res.json();
     }
 
+    function buscarAtajo(nombre) {
+      document.getElementById('teamInput').value = nombre;
+      ejecutarExtraccionTotal();
+    }
+
     async function ejecutarExtraccionTotal() {
       const query = document.getElementById('teamInput').value.trim();
       const btn = document.getElementById('btnBuscar');
@@ -128,15 +145,15 @@
 
       if (!query) return;
 
-      document.getElementById('debugLog').textContent = `Iniciando extracción paralela en 3 motores para: ${query}...`;
+      document.getElementById('debugLog').textContent = `Iniciando extracción masiva para "${query}"...`;
       btn.disabled = true;
       spinner.classList.remove('hidden');
 
-      // Ejecutar las 3 fuentes en paralelo
+      // Consultar en paralelo las 3 áreas de datos
       await Promise.allSettled([
-        cargarFuenteESPN(query),
-        cargarFuenteTheSportsDB(query),
-        cargarFuenteOpenFeed(query)
+        cargarPartidosYMetricasESPN(query),
+        cargarPlantillaJugadoresESPN(query),
+        cargarFuenteTheSportsDB(query)
       ]);
 
       btn.disabled = false;
@@ -144,39 +161,45 @@
     }
 
     // =========================================================================
-    // 1. MOTOR ESPN (CORREGIDO: Sin error 400, ruta universal de schedule)
+    // 1. PARTIDOS, TIROS, CÓRNERS, FALTAS Y ÁRBITROS
     // =========================================================================
-    async function cargarFuenteESPN(query) {
+    async function cargarPartidosYMetricasESPN(query) {
       const container = document.getElementById('espnContainer');
       const badge = document.getElementById('espnStatusBadge');
-      container.innerHTML = `<div class="py-6 text-center text-xs text-cyan-400 animate-pulse">Consultando ESPN...</div>`;
+      container.innerHTML = `<div class="py-6 text-center text-xs text-cyan-400 animate-pulse">Obteniendo partidos y métricas...</div>`;
       badge.textContent = "Buscando...";
       badge.className = "text-[10px] font-mono text-cyan-400";
 
       const qLower = query.toLowerCase();
-      let teamId = null;
-      let league = "all";
+      let teamId = "2097";
+      let league = "per.1";
+
+      if (TEAMS_DIRECTORY[qLower]) {
+        teamId = TEAMS_DIRECTORY[qLower].espnId;
+        league = TEAMS_DIRECTORY[qLower].espnLeague;
+      } else {
+        const s = await safeFetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(query)}&type=team&sport=soccer&limit=1`);
+        const hit = s.results?.[0]?.contents?.[0];
+        if (!hit) throw new Error("No localizado en ESPN");
+        const link = typeof hit.link === 'string' ? hit.link : (hit.link?.web || "");
+        const m = link.match(/\/id\/(\d+)/);
+        teamId = m ? m[1] : hit.id;
+        league = "all";
+      }
+
+      addLog(`[ESPN] Consultando ID: ${teamId} en liga: ${league}`);
 
       try {
-        if (TEAMS_DIRECTORY[qLower]) {
-          teamId = TEAMS_DIRECTORY[qLower].espnId;
-          league = TEAMS_DIRECTORY[qLower].espnLeague;
-        } else {
-          const s = await safeFetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(query)}&type=team&sport=soccer&limit=1`);
-          const hit = s.results?.[0]?.contents?.[0];
-          if (!hit) throw new Error("Equipo no localizado en ESPN");
-          const link = typeof hit.link === 'string' ? hit.link : (hit.link?.web || "");
-          const m = link.match(/\/id\/(\d+)/);
-          teamId = m ? m[1] : hit.id;
+        // SOLUCIÓN AL HTTP 500: Consultar primero con su liga específica; si falla, con all
+        let schedData = null;
+        try {
+          schedData = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/schedule`);
+        } catch (e) {
+          schedData = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams/${teamId}/schedule`);
         }
 
-        addLog(`[ESPN] Conectando a ID: ${teamId}`);
-
-        // RUTA UNIVERSAL: /all/teams/{id}/schedule nunca arroja error 400
-        const sched = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams/${teamId}/schedule`);
-        const events = sched.events || [];
-
-        if (events.length === 0) throw new Error("Sin partidos registrados en ESPN");
+        const events = schedData.events || [];
+        if (events.length === 0) throw new Error("Sin partidos en schedule");
 
         container.innerHTML = "";
         badge.textContent = `${Math.min(events.length, 3)} Partidos`;
@@ -189,12 +212,24 @@
           const homeC = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
           const awayC = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
 
-          let stats = { shotsOnTarget: { home: '-', away: '-' }, corners: { home: '-', away: '-' }, fouls: { home: '-', away: '-' }, possession: { home: '-', away: '-' }, referee: 'No registrado' };
+          let stats = {
+            shotsOnTarget: { home: '-', away: '-' },
+            corners: { home: '-', away: '-' },
+            fouls: { home: '-', away: '-' },
+            possession: { home: '-', away: '-' },
+            referee: 'No asignado',
+            venue: comp.venue?.fullName ? `${comp.venue.fullName} (${comp.venue.address?.city || ''})` : 'Sede oficial'
+          };
 
           try {
-            const sumData = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/all/summary?event=${item.id}`);
-            if (sumData.gameInfo?.officials?.[0]) stats.referee = sumData.gameInfo.officials[0].displayName;
+            const sumData = await safeFetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/summary?event=${item.id}`);
+            
+            // Árbitro principal
+            if (sumData.gameInfo?.officials?.[0]) {
+              stats.referee = sumData.gameInfo.officials[0].displayName;
+            }
 
+            // Estadísticas cuantitativas
             const bTeams = sumData.boxscore?.teams || [];
             if (bTeams.length >= 2) {
               const getS = (t, n) => t.statistics?.find(s => s.name === n || s.label?.toLowerCase() === n.toLowerCase())?.displayValue || '-';
@@ -206,37 +241,44 @@
               stats.possession = { home: getS(tH, 'possessionPct') ? `${getS(tH, 'possessionPct')}%` : '-', away: getS(tA, 'possessionPct') ? `${getS(tA, 'possessionPct')}%` : '-' };
             }
           } catch (e) {
-            addLog(`Detalles no disponibles para evento ${item.id}`);
+            addLog(`Detalles del evento ${item.id} no disponibles`);
           }
 
           const card = document.createElement('div');
-          card.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2 text-xs";
+          card.className = "bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-2.5 text-xs";
           card.innerHTML = `
             <div class="flex justify-between text-slate-400 text-[11px] border-b border-slate-800/80 pb-1.5">
-              <span class="truncate max-w-[170px] text-slate-300 font-semibold">${item.season?.name || comp.type?.text || 'Competición'}</span>
+              <span class="truncate max-w-[220px] text-slate-300 font-semibold">${item.season?.name || comp.type?.text || 'Competición'}</span>
               <span class="font-mono">${new Date(item.date).toLocaleDateString('es-ES')}</span>
             </div>
+
+            <!-- Marcador y Logos -->
             <div class="flex items-center justify-between py-1">
-              <div class="flex items-center gap-1.5 w-5/12">
-                ${homeC.team?.logo ? `<img src="${homeC.team.logo}" class="w-4 h-4 object-contain">` : ''}
+              <div class="flex items-center gap-2 w-5/12">
+                ${homeC.team?.logo ? `<img src="${homeC.team.logo}" class="w-5 h-5 object-contain">` : ''}
                 <span class="font-bold truncate ${homeC.team?.id === teamId ? 'text-cyan-400' : 'text-slate-200'}">${homeC.team?.displayName || 'Local'}</span>
               </div>
-              <div class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 font-black font-mono text-white text-xs">
+              <div class="px-3 py-1 rounded bg-slate-900 border border-slate-700 font-black font-mono text-white text-xs">
                 ${homeC.score?.displayValue ?? homeC.score ?? '-'} - ${awayC.score?.displayValue ?? awayC.score ?? '-'}
               </div>
-              <div class="flex items-center justify-end gap-1.5 w-5/12">
+              <div class="flex items-center justify-end gap-2 w-5/12">
                 <span class="font-bold truncate text-right ${awayC.team?.id === teamId ? 'text-cyan-400' : 'text-slate-200'}">${awayC.team?.displayName || 'Visita'}</span>
-                ${awayC.team?.logo ? `<img src="${awayC.team.logo}" class="w-4 h-4 object-contain">` : ''}
+                ${awayC.team?.logo ? `<img src="${awayC.team.logo}" class="w-5 h-5 object-contain">` : ''}
               </div>
             </div>
-            <div class="bg-slate-900/80 p-2 rounded-lg grid grid-cols-4 gap-1 text-center font-mono text-[11px]">
-              <div><span class="text-[8px] text-slate-500 block">Tiros</span><span class="text-cyan-400 font-bold">${stats.shotsOnTarget.home}-${stats.shotsOnTarget.away}</span></div>
-              <div><span class="text-[8px] text-slate-500 block">Córners</span><span class="text-emerald-400 font-bold">${stats.corners.home}-${stats.corners.away}</span></div>
-              <div><span class="text-[8px] text-slate-500 block">Faltas</span><span class="text-amber-400 font-bold">${stats.fouls.home}-${stats.fouls.away}</span></div>
-              <div><span class="text-[8px] text-slate-500 block">Posesión</span><span class="text-slate-300 font-bold">${stats.possession.home}/${stats.possession.away}</span></div>
+
+            <!-- Cuadrícula de Métricas Cuantitativas -->
+            <div class="bg-slate-900/90 p-2.5 rounded-lg grid grid-cols-4 gap-1 text-center font-mono text-[11px] border border-slate-800/60">
+              <div><span class="text-[9px] text-slate-500 block">Tiros Arco</span><span class="text-cyan-400 font-bold">${stats.shotsOnTarget.home}-${stats.shotsOnTarget.away}</span></div>
+              <div><span class="text-[9px] text-slate-500 block">Córners</span><span class="text-emerald-400 font-bold">${stats.corners.home}-${stats.corners.away}</span></div>
+              <div><span class="text-[9px] text-slate-500 block">Faltas</span><span class="text-amber-400 font-bold">${stats.fouls.home}-${stats.fouls.away}</span></div>
+              <div><span class="text-[9px] text-slate-500 block">Posesión</span><span class="text-slate-300 font-bold">${stats.possession.home}/${stats.possession.away}</span></div>
             </div>
-            <div class="text-[10px] text-slate-400 flex justify-between pt-0.5 truncate">
-              <span>⚖️ Árbitro: <b class="text-slate-300 font-normal">${stats.referee}</b></span>
+
+            <!-- Datos de Estadio y Árbitro -->
+            <div class="text-[11px] text-slate-400 flex flex-col sm:flex-row sm:justify-between gap-1 pt-1 border-t border-slate-800/40">
+              <span>⚖️ Árbitro: <b class="text-slate-200">${stats.referee}</b></span>
+              <span class="truncate">🏟️ ${stats.venue}</span>
             </div>
           `;
           container.appendChild(card);
@@ -245,47 +287,96 @@
       } catch (err) {
         badge.textContent = "Sin datos";
         badge.className = "text-[10px] font-mono text-rose-400";
-        container.innerHTML = `<div class="p-4 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">ESPN no devolvió encuentros (${err.message}).</div>`;
+        container.innerHTML = `<div class="p-4 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">No se encontraron encuentros en ESPN (${err.message}).</div>`;
         addLog(`[ESPN Fallo]: ${err.message}`);
       }
     }
 
     // =========================================================================
-    // 2. MOTOR THESPORTSDB (ARREGLADO: Proxy CORS con redundancia)
+    // 2. PLANTILLA DE JUGADORES (ROSTER COMPLETO CON FOTOS Y DORSALES)
+    // =========================================================================
+    async function cargarPlantillaJugadoresESPN(query) {
+      const container = document.getElementById('rosterContainer');
+      const badge = document.getElementById('rosterBadge');
+      container.innerHTML = `<div class="py-6 text-center text-xs text-amber-400 animate-pulse">Cargando jugadores...</div>`;
+
+      const qLower = query.toLowerCase();
+      let teamId = TEAMS_DIRECTORY[qLower]?.espnId || "2097";
+      let league = TEAMS_DIRECTORY[qLower]?.espnLeague || "per.1";
+
+      try {
+        const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/roster`;
+        addLog(`[Plantilla] Consultando roster en: ${rosterUrl}`);
+
+        const data = await safeFetch(rosterUrl);
+        const athletes = data.athletes || [];
+
+        if (athletes.length === 0) throw new Error("Sin plantilla registrada");
+
+        container.innerHTML = "";
+        let totalCount = 0;
+
+        athletes.forEach(group => {
+          const posTitle = group.position || "Plantel";
+          const players = group.items || [];
+          totalCount += players.length;
+
+          const groupHeader = document.createElement('div');
+          groupHeader.className = "text-[10px] uppercase font-bold text-slate-500 pt-1 border-b border-slate-800 pb-0.5";
+          groupHeader.textContent = posTitle;
+          container.appendChild(groupHeader);
+
+          players.slice(0, 5).forEach(p => {
+            const row = document.createElement('div');
+            row.className = "flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80 text-xs hover:border-slate-700";
+            row.innerHTML = `
+              <div class="flex items-center gap-2">
+                <span class="w-5 text-center font-mono font-bold text-cyan-400 text-[11px]">${p.jersey || '#'}</span>
+                <div>
+                  <div class="font-bold text-slate-200 text-xs">${p.displayName || p.fullName}</div>
+                  <div class="text-[10px] text-slate-500">${p.citizenship || 'Oficial'} • ${p.age ? p.age + ' años' : ''}</div>
+                </div>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">${p.position?.abbreviation || ''}</span>
+            `;
+            container.appendChild(row);
+          });
+        });
+
+        badge.textContent = `${totalCount} jugadores`;
+        badge.className = "text-[10px] font-mono text-emerald-400 font-bold";
+
+      } catch (err) {
+        badge.textContent = "Sin plantilla";
+        container.innerHTML = `<div class="p-3 text-xs text-slate-500 text-center">Plantilla detallada no disponible para este equipo.</div>`;
+        addLog(`[Plantilla Fallo]: ${err.message}`);
+      }
+    }
+
+    // =========================================================================
+    // 3. THESPORTSDB (ARREGLADO: Conexión HTTPS limpia)
     // =========================================================================
     async function cargarFuenteTheSportsDB(query) {
       const container = document.getElementById('sdbContainer');
       const badge = document.getElementById('sdbStatusBadge');
       container.innerHTML = `<div class="py-6 text-center text-xs text-emerald-400 animate-pulse">Consultando TheSportsDB...</div>`;
-      badge.textContent = "Buscando...";
-      badge.className = "text-[10px] font-mono text-emerald-400";
 
       const qLower = query.toLowerCase();
       const sdbTerm = TEAMS_DIRECTORY[qLower]?.sdbName || query;
 
       try {
-        addLog(`[TheSportsDB] Buscando: ${sdbTerm}`);
-        
-        // Función auxiliar que intenta directo y luego con proxy seguro
-        const fetchSdb = async (endpoint) => {
-          try {
-            return await safeFetch(endpoint);
-          } catch (e) {
-            const proxy = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
-            return await safeFetch(proxy);
-          }
-        };
+        // En GitHub Pages HTTPS funciona directamente a thesportsdb.com
+        const sUrl = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(sdbTerm)}`;
+        const sData = await safeFetch(sUrl);
 
-        const sData = await fetchSdb(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(sdbTerm)}`);
-        if (!sData.teams || sData.teams.length === 0) throw new Error("Equipo no registrado en TheSportsDB");
+        if (!sData.teams || sData.teams.length === 0) throw new Error("No encontrado en TheSportsDB");
 
         const team = sData.teams[0];
-        addLog(`[TheSportsDB] Club localizado: ${team.strTeam} (ID: ${team.idTeam})`);
-
-        const evData = await fetchSdb(`https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=${team.idTeam}`);
+        const evUrl = `https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=${team.idTeam}`;
+        const evData = await safeFetch(evUrl);
         const results = evData.results || [];
 
-        if (results.length === 0) throw new Error("Sin partidos recientes en registro");
+        if (results.length === 0) throw new Error("Sin partidos registrados");
 
         container.innerHTML = "";
         badge.textContent = `${results.length} Partidos`;
@@ -295,24 +386,19 @@
           const card = document.createElement('div');
           card.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2 text-xs";
           card.innerHTML = `
-            <div class="flex justify-between text-slate-400 text-[11px] border-b border-slate-800/80 pb-1.5">
-              <span class="truncate max-w-[170px] text-slate-300 font-semibold">${m.strLeague || 'Liga Oficial'}</span>
+            <div class="flex justify-between text-slate-400 text-[11px] border-b border-slate-800/80 pb-1">
+              <span class="truncate max-w-[150px] text-slate-300 font-semibold">${m.strLeague || 'Liga'}</span>
               <span class="font-mono">${m.dateEvent ? new Date(m.dateEvent).toLocaleDateString('es-ES') : ''}</span>
             </div>
             <div class="flex items-center justify-between py-1">
-              <div class="flex items-center gap-1 w-5/12">
-                <span class="font-bold truncate text-slate-200">${m.strHomeTeam}</span>
-              </div>
+              <span class="font-bold truncate text-slate-200 w-5/12">${m.strHomeTeam}</span>
               <div class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 font-black font-mono text-white text-xs">
                 ${m.intHomeScore ?? '-'} - ${m.intAwayScore ?? '-'}
               </div>
-              <div class="flex items-center justify-end gap-1 w-5/12">
-                <span class="font-bold truncate text-right text-slate-200">${m.strAwayTeam}</span>
-              </div>
+              <span class="font-bold truncate text-right text-slate-200 w-5/12">${m.strAwayTeam}</span>
             </div>
-            <div class="text-[10px] text-slate-400 flex justify-between pt-0.5 truncate border-t border-slate-800/40">
-              <span>🏟️ Estadio: <b class="text-slate-300 font-normal">${m.strVenue || 'Sede oficial'}</b></span>
-              <span class="text-emerald-400 font-mono">Verificado</span>
+            <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/40 truncate">
+              🏟️ Sede: <b class="text-slate-300 font-normal">${m.strVenue || 'Estadio oficial'}</b>
             </div>
           `;
           container.appendChild(card);
@@ -320,73 +406,8 @@
 
       } catch (err) {
         badge.textContent = "Sin datos";
-        badge.className = "text-[10px] font-mono text-rose-400";
-        container.innerHTML = `<div class="p-4 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">TheSportsDB no devolvió resultados para "${sdbTerm}".</div>`;
+        container.innerHTML = `<div class="p-3 text-xs text-slate-500 text-center">Registro no disponible en TheSportsDB.</div>`;
         addLog(`[TheSportsDB Fallo]: ${err.message}`);
-      }
-    }
-
-    // =========================================================================
-    // 3. MOTOR GLOBAL OPEN FEED (Fallback Conmebol / UEFA Scoreboard)
-    // =========================================================================
-    async function cargarFuenteOpenFeed(query) {
-      const container = document.getElementById('openContainer');
-      const badge = document.getElementById('openStatusBadge');
-      container.innerHTML = `<div class="py-6 text-center text-xs text-amber-400 animate-pulse">Rastreando Global Feed...</div>`;
-      badge.textContent = "Buscando...";
-      badge.className = "text-[10px] font-mono text-amber-400";
-
-      const qLower = query.toLowerCase();
-
-      try {
-        // Consultar el feed de fixtures mundiales del día y fechas cercanas
-        const feedUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/all/scoreboard`;
-        const data = await safeFetch(feedUrl);
-        const events = data.events || [];
-
-        const found = events.filter(e => {
-          const comps = e.competitions?.[0]?.competitors || [];
-          return comps.some(c => c.team?.displayName?.toLowerCase().includes(qLower));
-        });
-
-        if (found.length === 0) throw new Error("Sin partidos en el calendario activo del feed");
-
-        container.innerHTML = "";
-        badge.textContent = `${found.length} Partidos`;
-        badge.className = "text-[10px] font-mono text-amber-400 font-bold";
-
-        found.slice(0, 3).forEach(item => {
-          const comp = item.competitions?.[0] || {};
-          const homeC = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
-          const awayC = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
-
-          const card = document.createElement('div');
-          card.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2 text-xs";
-          card.innerHTML = `
-            <div class="flex justify-between text-slate-400 text-[11px] border-b border-slate-800/80 pb-1.5">
-              <span class="truncate max-w-[170px] text-slate-300 font-semibold">${item.season?.name || comp.type?.text || 'Competición'}</span>
-              <span class="font-mono">${new Date(item.date).toLocaleDateString('es-ES')}</span>
-            </div>
-            <div class="flex items-center justify-between py-1">
-              <span class="font-bold truncate text-slate-200 w-5/12">${homeC.team?.displayName || 'Local'}</span>
-              <div class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 font-black font-mono text-white text-xs">
-                ${homeC.score ?? '-'} - ${awayC.score ?? '-'}
-              </div>
-              <span class="font-bold truncate text-right text-slate-200 w-5/12">${awayC.team?.displayName || 'Visita'}</span>
-            </div>
-            <div class="text-[10px] text-slate-400 flex justify-between pt-0.5 border-t border-slate-800/40">
-              <span>Estado: <b class="text-amber-300 font-mono">${comp.status?.type?.detail || 'Oficial'}</b></span>
-              <span>🏟️ ${comp.venue?.fullName || 'Estadio oficial'}</span>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        badge.textContent = "Sin datos";
-        badge.className = "text-[10px] font-mono text-rose-400";
-        container.innerHTML = `<div class="p-4 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">Global Open Feed no tiene partidos activos esta semana para este equipo.</div>`;
-        addLog(`[Global Feed Fallo]: ${err.message}`);
       }
     }
   </script>
