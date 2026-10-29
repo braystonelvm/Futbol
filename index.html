@@ -73,7 +73,7 @@
         </div>
       </div>
 
-      <!-- COLUMNA 3: PLANTILLA DE JUGADORES (CORREGIDO SIN OBJECT OBJECT) -->
+      <!-- COLUMNA 3: PLANTILLA DE JUGADORES -->
       <div class="lg:col-span-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
           <div class="flex items-center gap-2">
@@ -97,14 +97,14 @@
   </div>
 
   <script>
-    // Catálogo canónico con identificadores precisos para evitar errores 500 en la red de ESPN
+    // Catálogo canónico con identificadores y ligas exactas
     const TEAMS_DIRECTORY = {
-      'cienciano': { espnId: '2097', espnLeague: 'per.1', name: 'Cienciano' },
-      'alianza lima': { espnId: '2085', espnLeague: 'per.1', name: 'Alianza Lima' },
-      'universitario': { espnId: '2094', espnLeague: 'per.1', name: 'Universitario' },
-      'sporting cristal': { espnId: '2093', espnLeague: 'per.1', name: 'Sporting Cristal' },
-      'melgar': { espnId: '2090', espnLeague: 'per.1', name: 'FBC Melgar' },
-      'sport boys': { espnId: '2092', espnLeague: 'per.1', name: 'Sport Boys' },
+      'cienciano': { espnId: '2097', espnLeague: 'peru.1', name: 'Cienciano' },
+      'alianza lima': { espnId: '2085', espnLeague: 'peru.1', name: 'Alianza Lima' },
+      'universitario': { espnId: '2094', espnLeague: 'peru.1', name: 'Universitario' },
+      'sporting cristal': { espnId: '2093', espnLeague: 'peru.1', name: 'Sporting Cristal' },
+      'melgar': { espnId: '2090', espnLeague: 'peru.1', name: 'FBC Melgar' },
+      'sport boys': { espnId: '2092', espnLeague: 'peru.1', name: 'Sport Boys' },
       'boca juniors': { espnId: '5', espnLeague: 'arg.1', name: 'Boca Juniors' },
       'river plate': { espnId: '16', espnLeague: 'arg.1', name: 'River Plate' },
       'argentina': { espnId: '202', espnLeague: 'fifa.world', name: 'Argentina' },
@@ -155,7 +155,7 @@
     }
 
     // =========================================================================
-    // 1. EXTRACTOR Y SEGMENTADOR: 5 DE LOCAL Y 5 DE VISITANTE CON MÉTRICAS
+    // 1. EXTRACTOR Y SEGMENTADOR (5 LOCALES Y 5 VISITANTES)
     // =========================================================================
     async function cargarPartidosSegmentados(query) {
       const homeContainer = document.getElementById('homeMatchesContainer');
@@ -168,7 +168,7 @@
 
       const qLower = query.toLowerCase();
       let teamId = "2097";
-      let league = "per.1";
+      let league = "peru.1";
 
       if (TEAMS_DIRECTORY[qLower]) {
         teamId = TEAMS_DIRECTORY[qLower].espnId;
@@ -183,39 +183,40 @@
         league = "all";
       }
 
-      addLog(`[Extracción] ID: ${teamId} | Torneo Base: ${league}`);
+      addLog(`[Extracción] ID: ${teamId} | Liga Asignada: ${league}`);
 
       try {
         let events = [];
 
-        // Estrategia de triple conector para evitar HTTP 500 en ligas Conmebol y sudamericanas
+        // Conexión resiliente: se prueban endpoints sin parámetros inválidos
         const endpointsToTry = [
           `https://site.web.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/schedule`,
-          `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/schedule`,
           `https://site.web.api.espn.com/apis/site/v2/sports/soccer/all/teams/${teamId}/schedule`,
-          `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard`
+          `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/schedule`,
+          `https://site.api.espn.com/apis/site/v2/sports/soccer/per.1/scoreboard`,
+          `https://site.api.espn.com/apis/site/v2/sports/soccer/peru.1/scoreboard`
         ];
 
         for (const ep of endpointsToTry) {
           try {
-            addLog(`Probando endpoint: ${ep}`);
+            addLog(`Consultando: ${ep}`);
             const data = await safeFetch(ep);
             if (data.events && data.events.length > 0) {
               events = data.events;
-              addLog(`Éxito con ${events.length} partidos encontrados`);
+              addLog(`Encontrados ${events.length} partidos`);
               break;
             }
           } catch (e) {
-            addLog(`Fallo endpoint (${e.message}), probando siguiente...`);
+            addLog(`Endpoint descartado: ${e.message}`);
           }
         }
 
-        if (events.length === 0) throw new Error("No se encontraron partidos finalizados para este club.");
+        if (events.length === 0) throw new Error("No hay eventos disponibles en la base de datos.");
 
-        // Separar estrictamente por condición de LOCAL o VISITANTE
         const localMatches = [];
         const awayMatches = [];
 
+        // Clasificar estrictamente en condición de Casa o Fuera
         events.forEach(ev => {
           const comp = ev.competitions?.[0] || {};
           const competitors = comp.competitors || [];
@@ -234,14 +235,13 @@
           }
         });
 
-        addLog(`Segmentación lista: ${localMatches.length} en casa, ${awayMatches.length} fuera`);
         homeBadge.textContent = `${localMatches.length} partidos`;
         awayBadge.textContent = `${awayMatches.length} partidos`;
 
-        // Renderizar columna de Local
+        // Renderizar Local
         homeContainer.innerHTML = "";
         if (localMatches.length === 0) {
-          homeContainer.innerHTML = `<div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">No hay registros recientes jugando de local.</div>`;
+          homeContainer.innerHTML = `<div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">Sin partidos recientes de local.</div>`;
         } else {
           for (const item of localMatches) {
             const card = await crearTarjetaPartidoConMetricas(item, teamId, league);
@@ -249,10 +249,10 @@
           }
         }
 
-        // Renderizar columna de Visitante
+        // Renderizar Visita
         awayContainer.innerHTML = "";
         if (awayMatches.length === 0) {
-          awayContainer.innerHTML = `<div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">No hay registros recientes jugando de visita.</div>`;
+          awayContainer.innerHTML = `<div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">Sin partidos recientes de visita.</div>`;
         } else {
           for (const item of awayMatches) {
             const card = await crearTarjetaPartidoConMetricas(item, teamId, league);
@@ -261,13 +261,12 @@
         }
 
       } catch (err) {
-        homeContainer.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/30 border border-rose-900/50 text-xs text-rose-300 text-center">Error al extraer partidos: ${err.message}</div>`;
-        awayContainer.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/30 border border-rose-900/50 text-xs text-rose-300 text-center">Error al extraer partidos: ${err.message}</div>`;
+        homeContainer.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/30 border border-rose-900/50 text-xs text-rose-300 text-center">Error: ${err.message}</div>`;
+        awayContainer.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/30 border border-rose-900/50 text-xs text-rose-300 text-center">Error: ${err.message}</div>`;
         addLog(`[Error Partidos]: ${err.message}`);
       }
     }
 
-    // Helper: Genera cada tarjeta consultando tiros, córners, faltas y árbitro
     async function crearTarjetaPartidoConMetricas(matchObj, targetTeamId, league) {
       const { ev, homeC, awayC, comp, isLocal } = matchObj;
       const gameId = ev.id;
@@ -336,7 +335,7 @@
     }
 
     // =========================================================================
-    // 2. PLANTILLA DE JUGADORES (ROSTER COMPLETO - CORREGIDO SIN [OBJECT OBJECT])
+    // 2. PLANTILLA OFICIAL (CORREGIDO: Extracción profunda de jugadores)
     // =========================================================================
     async function cargarPlantillaJugadores(query) {
       const container = document.getElementById('rosterContainer');
@@ -345,30 +344,32 @@
 
       const qLower = query.toLowerCase();
       let teamId = TEAMS_DIRECTORY[qLower]?.espnId || "2097";
-      let league = TEAMS_DIRECTORY[qLower]?.espnLeague || "per.1";
+      let league = TEAMS_DIRECTORY[qLower]?.espnLeague || "peru.1";
 
       try {
         const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/teams/${teamId}/roster`;
-        addLog(`[Plantilla] Consultando roster en: ${rosterUrl}`);
+        addLog(`[Plantilla] Consultando: ${rosterUrl}`);
 
         const data = await safeFetch(rosterUrl);
         const athletes = data.athletes || [];
 
-        if (athletes.length === 0) throw new Error("Plantilla no listada");
+        if (athletes.length === 0) throw new Error("Plantilla vacía");
 
         container.innerHTML = "";
         let totalCount = 0;
 
         athletes.forEach(group => {
-          // CORRECCIÓN CLAVE: Extraer string del título de posición aunque venga como objeto JSON
           let posTitle = "Plantel";
           if (typeof group.position === 'string') {
             posTitle = group.position;
           } else if (group.position && typeof group.position === 'object') {
-            posTitle = group.position.text || group.position.name || group.position.displayName || "Línea";
+            posTitle = group.position.displayName || group.position.name || group.position.text || "Línea";
           }
 
-          const players = group.items || [];
+          // Compatibilidad: la lista de jugadores puede venir en .items o en .athletes
+          const players = group.items || group.athletes || [];
+          if (players.length === 0) return;
+
           totalCount += players.length;
 
           const groupHeader = document.createElement('div');
@@ -376,30 +377,32 @@
           groupHeader.textContent = posTitle;
           container.appendChild(groupHeader);
 
-          players.slice(0, 6).forEach(p => {
+          players.forEach(p => {
             const row = document.createElement('div');
             row.className = "flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80 text-xs hover:border-slate-700 transition-all";
             row.innerHTML = `
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 truncate">
                 <span class="w-5 text-center font-mono font-bold text-cyan-400 text-[11px]">${p.jersey || '#'}</span>
-                <div>
-                  <div class="font-bold text-slate-200 text-xs">${p.displayName || p.fullName}</div>
+                <div class="truncate">
+                  <div class="font-bold text-slate-200 text-xs truncate">${p.displayName || p.fullName || p.name}</div>
                   <div class="text-[10px] text-slate-500">${p.citizenship || 'Oficial'} ${p.age ? '• ' + p.age + ' años' : ''}</div>
                 </div>
               </div>
-              <span class="text-[10px] text-slate-400 font-mono">${p.position?.abbreviation || ''}</span>
+              <span class="text-[10px] text-slate-400 font-mono ml-1">${p.position?.abbreviation || ''}</span>
             `;
             container.appendChild(row);
           });
         });
+
+        if (totalCount === 0) throw new Error("Sin registros procesables de atletas");
 
         badge.textContent = `${totalCount} jugadores`;
         badge.className = "text-[10px] font-mono text-emerald-400 font-bold";
 
       } catch (err) {
         badge.textContent = "Sin datos";
-        container.innerHTML = `<div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-500 text-center">Plantilla detallada no disponible en este feed para el equipo seleccionado.</div>`;
-        addLog(`[Error Plantilla]: ${err.message}`);
+        container.innerHTML = `<div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-500 text-center">Plantilla detallada no disponible para este equipo en el feed oficial.</div>`;
+        addLog(`[Plantilla Fallo]: ${err.message}`);
       }
     }
   </script>
